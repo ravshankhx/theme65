@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:theme65/model/post_model.dart';
+import 'package:theme65/model/emp_list_model.dart';
+import 'package:theme65/model/emp_model.dart';
+import 'package:theme65/model/empone_model.dart';
+import 'package:theme65/pages/detail_page.dart';
 import 'package:theme65/services/http_service.dart';
 
 class HomePage extends StatefulWidget {
+  static final String id = "home_page";
+
   const HomePage({Key? key}) : super(key: key);
 
   @override
@@ -10,69 +15,96 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-    String data= "";
-   @override
-   void initState() {
-     // TODO: implement initState
-     super.initState();
-     var employees = new Employees(id: "1",employee_age: "22",employee_name: "ra",employee_salary: "32131",profile_image: "");
-     var employee = new Employee(id:1,salary: "1000",name: "online",age: "1");
-     print(employee);
-     print(employees);
-     _apiPostList();
-     _apiPostListt();
-     _apiCreatePost(employee);
-     _apiPostUpdate(employees);
-     _apiDeletePost(employees);
+  List<Employees> items = [];
 
-
-   }
-  void _apiPostList(){
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _apiEmpList();
+  }
+  Future _openDetails(Employees item)async{
+    Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context){
+      return new DetailPage(
+        input: item.id,
+      );
+    })
+    );
+  }
+  void _apiEmpList() {
     Network.GET(Network.API_LIST, Network.paramsEmpty()).then((response) => {
-      print(response),
-      _showResponse(response!),
-    });
+          print(response),
+          _showResponse(response!),
+        });
   }
-    void _apiPostListt(){
-      Network.GET1(Network.API_LISTT, Network.paramsEmpty()).then((response) => {
-        print(response),
-        _showResponse(response!),
+
+  void _showResponse(String response) {
+    if (response != null) {
+      EmpList empList = Network.parseEmpList(response);
+      setState(() {
+        items = empList.data;
       });
+    } else {
+      print("Try again!");
     }
-  void _apiCreatePost(Employee employee){
-    Network.POST(Network.API_CREATE, Network.paramsCreate(employee)).then((response) => {
-      print(response),
-      _showResponse(response!),
-    });
   }
 
-   void _apiPostUpdate(Employees employees){
-     Network.PUT(Network.API_UPDATE + employees.id.toString(), Network.paramsUpdate(employees)).then((response) => {
-       print(response),
-       _showResponse(response!),
-     });
-   }
-  void _apiDeletePost(Employees employees){
-    Network.DEL(Network.API_DELETE, Network.paramsEmpty()).then((response) => {
-      print(response),
-      _showResponse(response!),
-    });
-  }
-  void _showResponse(String response){
-    setState(() {
-      data =response;
-    });
-
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Center(
-          child: Text(data != null ? data : "KASFKASfpa",style: TextStyle(fontSize: 50),),
-        )
-      )
+        appBar: AppBar(
+          elevation: 0,
+          title: Text("Employee List"),
+        ),
+        body: ListView.builder(
+          itemBuilder: (ctx, i) {
+            return itemOfList(items[i]);
+          },
+          itemCount: items.length,
+        ));
+  }
+
+  Widget itemOfList(Employees emp) {
+    return Container(
+      child: Column(
+        children: [
+          SizedBox(height: 10,),
+          FlatButton(onPressed: () {
+
+            _openDetails(emp);
+          },
+              child: Container(
+                width: double.infinity,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: 5,
+                ),
+                Text(
+                  emp.employee_name! +
+                      "(" +
+                      emp.employee_age.toString() +
+                      ")",
+                  style: TextStyle(color: Colors.black, fontSize: 20),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  emp.employee_salary.toString() + "\$",
+                  style: TextStyle(color: Colors.black, fontSize: 18),
+                ),
+                SizedBox(
+                  height: 5,
+                ),
+              ],
+            ),
+          )),
+        ],
+      ),
     );
   }
 }

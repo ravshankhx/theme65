@@ -1,20 +1,22 @@
 import 'dart:convert';
 
 import 'package:http/http.dart';
-import 'package:theme65/model/post_model.dart';
-//http://dummy.restapiexample.com/api/v1/employees
+import 'package:theme65/model/emp_create_model.dart';
+import 'package:theme65/model/emp_delete_model.dart';
+import 'package:theme65/model/emp_list_model.dart';
+import 'package:theme65/model/emp_model.dart';
+import 'package:theme65/model/emp_update_model.dart';
+import 'package:theme65/model/empone_model.dart';
 class Network {
   static String BASE = "dummy.restapiexample.com";
   static Map<String,String> headers = {'Content-Type':'application/json; charset=UTF-8'};
 
-  static String status = "success";
 
-
-  static String API_LIST = "/api/v1/employee";
- static String API_LISTT = "/employee/1";
-  static String API_CREATE = "/create";
-  static String API_UPDATE = "/update/21"; //{id}
-  static String API_DELETE = "/delete/2";
+  static String API_LIST = "/api/v1/employees";
+ static String API_LISTT = "/api/v1/employee/";
+  static String API_CREATE = "/api/v1/create";
+  static String API_UPDATE = "/api/v1/update/21"; //{id}
+  static String API_DELETE = "/api/v1/delete/2";
 
 
   static Future <String?> GET(String api,Map<String,String> params)async{
@@ -71,17 +73,6 @@ class Network {
     return params;
   }
 
-
-  static Map<String,String> paramsCreate(Employee employee){
-    Map<String,String> params = new Map();
-    params.addAll({
-    'name': employee.name.toString(),
-    'salary':employee.salary.toString(),
-    'age': employee.age.toString(),
-    'id':employee.id.toString()
-    });
-    return params;
-  }
   static Map<String, String> paramsUpdate(Employees employees) {
     Map<String, String> params = new Map();
     params.addAll({
@@ -94,6 +85,33 @@ class Network {
     });
     return params;
   }
+// Http parsing
+static EmpList parseEmpList(String response){
+    dynamic json = jsonDecode(response);
+    var data = EmpList.fromJson(json);
+    return data;
+}
+  static EmpOne parseEmpOne(String response){
+    dynamic json = jsonDecode(response);
+    var data = EmpOne.fromJson(json);
+    return data;
+  }
+  static EmpCreate parseEmpCreate(String response){
+    dynamic json = jsonDecode(response);
+    var data = EmpCreate.fromJson(json);
+    return data;
+  }
+  static EmpDelete parseEmpDelete(String response){
+    dynamic json = jsonDecode(response);
+    var data = EmpDelete.fromJson(json);
+    return data;
+  }
+  static EmpUpdate parseEmpUpdate(String response){
+    dynamic json = jsonDecode(response);
+    var data = EmpUpdate.fromJson(json);
+    return data;
+  }
+
 
 
 }
